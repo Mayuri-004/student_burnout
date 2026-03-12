@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Burnout Monitoring System</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --primary: #1e4db7;
+  --primary-light: #2d62d4;
+  --primary-dark: #163a8a;
+  --sidebar-bg: #1e4db7;
+  --sidebar-active: rgba(255,255,255,0.18);
+  --bg: #eef2f7;
+  --card: #ffffff;
+  --text: #1a2340;
+  --text-muted: #6b7a99;
+  --border: #e2e8f4;
+  --low: #22c55e;
+  --low-bg: #dcfce7;
+  --med: #f97316;
+  --med-bg: #ffedd5;
+  --high: #ef4444;
+  --high-bg: #fee2e2;
+  --shadow: 0 4px 24px rgba(30,77,183,0.08);
+  --shadow-lg: 0 8px 40px rgba(30,77,183,0.14);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 72px;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  z-index: 100;
+  box-shadow: 4px 0 20px rgba(30,77,183,0.2);
+}
+
+.sidebar-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 28px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sidebar-avatar:hover { background: rgba(255,255,255,0.3); }
+
+.nav-items { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 10px; }
+
+.nav-item {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 10px 6px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  gap: 4px;
+  border: none; background: transparent;
+}
+
+.nav-item:hover { background: var(--sidebar-active); }
+.nav-item.active { background: rgba(255,255,255,0.22); }
+
+.nav-icon {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.7);
+  font-size: 1rem;
+}
+
+.nav-item.active .nav-icon { color: #ffffff; }
+
+.nav-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.65);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.nav-item.active .nav-label { color: #ffffff; }
+
+.sidebar-settings {
+  margin-top: auto;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+  width: 100%; padding: 0 10px;
+}
+
+/* ===== MAIN ===== */
+.main {
+  margin-left: 72px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 12px rgba(30,77,183,0.06);
+}
+
+.topbar-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: -0.01em;
+}
+
+.topbar-title span { color: var(--text-muted); font-weight: 400; }
+
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.topbar-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 100px;
+  background: var(--primary);
+  color: white;
+}
+
+.topbar-dots {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+.topbar-dots:hover { background: var(--bg); }
+
+/* ===== PAGES ===== */
+.page { display: none; padding: 28px; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== ASSESSMENT PAGE ===== */
+.page-header {
+  margin-bottom: 22px;
+}
+.page-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.page-header p { font-size: 0.82rem; color: var(--text-muted); }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+
+.form-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+.form-select, .form-input {
+  appearance: none;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.82rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7a99' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+.form-select:focus, .form-input:focus {
+  border-color: var(--primary);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(30,77,183,0.1);
+}
+
+/* RESULT CARD */
+.result-card {
+  background: linear-gradient(135deg, #fff8f8 0%, #ffffff 100%);
+  border: 1.5px solid #fde8e8;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.result-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--high), var(--med));
+}
+
+.result-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.result-left h3 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 4px 0;
+}
+
+.risk-badge.high { color: var(--high); }
+.risk-badge.medium { color: var(--med); }
+.risk-badge.low { color: var(--low); }
+
+.risk-badge::before {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* GAUGE */
+.gauge-wrap {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.gauge-container {
+  position: relative;
+  width: 110px;
+  height: 60px;
+  overflow: hidden;
+}
+
+.gauge-svg { width: 110px; height: 110px; margin-top: -55px; }
+
+.gauge-needle {
+  transform-origin: 55px 55px;
+  transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gauge-value {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-top: 4px;
+  line-height: 1;
+}
+
+.gauge-label { font-size: 0.6rem; color: var(--text-muted); text-align: center; }
+
+/* TRIGGERS & RECS */
+.triggers-section, .recs-section { margin-bottom: 12px; }
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.trigger-item, .rec-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+
+.trigger-item::before { content: '•'; color: var(--high); font-weight: 700; margin-top: 1px; }
+.rec-item::before { content: '•'; color: var(--primary); font-weight: 700; margin-top: 1px; }
+
+/* PREDICT BUTTON */
+.predict-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 16px rgba(30,77,183,0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.predict-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.predict-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(30,77,183,0.45); }
+.predict-btn:hover::after { opacity: 1; }
+.predict-btn:active { transform: translateY(0); }
+
+.predict-btn.loading { pointer-events: none; }
+
+/* SCORE BAR */
+.score-bar-wrap { margin: 14px 0 10px; }
+.score-bar-label { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 5px; }
+.score-bar {
+  height: 8px;
+  border-radius: 100px;
+  background: var(--border);
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--low) 0%, var(--med) 50%, var(--high) 100%);
+  transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 0;
+}
+
+/* ===== DASHBOARD PAGE ===== */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+.stat-card-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.stat-card-val {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-card-sub { font-size: 0.72rem; color: var(--text-muted); }
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.charts-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.chart-card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.chart-card:hover { box-shadow: var(--shadow-lg); }
+
+.chart-card-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chart-card-title .chip {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 100px;
+  background: var(--bg);
+  color: var(--text-muted);
+}
+
+.chart-wrap { position: relative; }
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+/* ===== HISTORY PAGE ===== */
+.history-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-btn {
+  padding: 7px 16px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: white;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover, .filter-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.history-search {
+  margin-left: auto;
+  position: relative;
+}
+
+.history-search input {
+  padding: 7px 14px 7px 34px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: white;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.78rem;
+  color: var(--text);
+  outline: none;
+  transition: all 0.2s;
+  width: 180px;
+}
+
+.history-search input:focus { border-color: var(--primary); }
+.history-search::before {
+  content: '🔍';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+}
+
+.history-table-card {
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table thead tr {
+  background: #f8faff;
+  border-bottom: 1.5px solid var(--border);
+}
+
+.history-table th {
+  padding: 12px 18px;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.history-table td {
+  padding: 14px 18px;
+  font-size: 0.82rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.history-table tbody tr:last-child td { border-bottom: none; }
+.history-table tbody tr:hover td { background: #f8faff; }
+
+.risk-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 100px;
+}
+
+.risk-tag.high { background: var(--high-bg); color: var(--high); }
+.risk-tag.medium { background: var(--med-bg); color: var(--med); }
+.risk-tag.low { background: var(--low-bg); color: var(--low); }
+
+.risk-tag::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.score-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-mini-bar {
+  width: 60px;
+  height: 5px;
+  background: var(--border);
+  border-radius: 100px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.score-mini-fill {
+  height: 100%;
+  border-radius: 100px;
+}
+
+/* SETTINGS NAV ITEM */
+.nav-settings {
+  margin-top: auto;
+}
+
+/* ===== EMPTY STATE / LOADER ===== */
+.predict-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 30px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.dot-pulse {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: dotPulse 1.4s infinite ease-in-out;
+}
+.dot-pulse:nth-child(2) { animation-delay: 0.2s; }
+.dot-pulse:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c5d0e8; border-radius: 100px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-avatar">👩</div>
+  <nav class="nav-items">
+    <button class="nav-item active" onclick="showPage('assessment', this)">
+      <div class="nav-icon">🏠</div>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-item" onclick="showPage('dashboard', this)">
+      <div class="nav-icon">📊</div>
+      <span class="nav-label">Analytics</span>
+    </button>
+    <button class="nav-item" onclick="showPage('history', this)">
+      <div class="nav-icon">🕐</div>
+      <span class="nav-label">History</span>
+    </button>
+    <button class="nav-item" onclick="showPage('settings', this)">
+      <div class="nav-icon">⚙️</div>
+      <span class="nav-label">Settings</span>
+    </button>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar" id="topbar">
+    <div class="topbar-title" id="topbar-title">Home <span>/ Burnout Assessment</span></div>
+    <div class="topbar-right">
+      <span class="topbar-badge" id="topbar-badge">Daily Check</span>
+      <div class="topbar-dots">⋯</div>
+    </div>
+  </div>
+
+  <!-- ===== ASSESSMENT PAGE ===== -->
+  <div class="page active" id="page-assessment">
+    <div class="page-header">
+      <h2>Daily Activity Input</h2>
+      <p>Fill in today's details to predict your burnout risk</p>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Study Hours</label>
+        <select class="form-select" id="studyHours">
+          <option value="">Select hours</option>
+          <option value="1">1 hour</option>
+          <option value="2">2 hours</option>
+          <option value="3">3 hours</option>
+          <option value="4">4 hours</option>
+          <option value="5">5 hours</option>
+          <option value="6">6 hours</option>
+          <option value="7">7 hours</option>
+          <option value="8">8+ hours</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Sleep Hours</label>
+        <select class="form-select" id="sleepHours">
+          <option value="">Select hours</option>
+          <option value="4">4 hours or less</option>
+          <option value="5">5 hours</option>
+          <option value="6">6 hours</option>
+          <option value="7">7 hours</option>
+          <option value="8">8 hours</option>
+          <option value="9">9+ hours</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Screen Time</label>
+        <select class="form-select" id="screenTime">
+          <option value="">Select hours</option>
+          <option value="2">2 hours</option>
+          <option value="4">4 hours</option>
+          <option value="6">6 hours</option>
+          <option value="8">8 hours</option>
+          <option value="10">10 hours</option>
+          <option value="12">12+ hours</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Assignment Load</label>
+        <select class="form-select" id="assignmentLoad">
+          <option value="">Select load</option>
+          <option value="1">Light (1–2)</option>
+          <option value="3">Moderate (3–4)</option>
+          <option value="5">Heavy (5+)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Exam Pressure</label>
+        <select class="form-select" id="examPressure">
+          <option value="">Select level</option>
+          <option value="2">Low (1–3)</option>
+          <option value="5">Medium (4–6)</option>
+          <option value="8">High (7–10)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Physical Activity</label>
+        <select class="form-select" id="physicalActivity">
+          <option value="">Select activity</option>
+          <option value="0">None</option>
+          <option value="1">Light (walk/stretch)</option>
+          <option value="2">Moderate (30–60 min)</option>
+          <option value="3">Active (1+ hours)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Backlogs</label>
+        <select class="form-select" id="backlogs">
+          <option value="">Select</option>
+          <option value="0">None</option>
+          <option value="1">1 backlog</option>
+          <option value="2">2 backlogs</option>
+          <option value="3">3+ backlogs</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Mood Score</label>
+        <select class="form-select" id="moodScore">
+          <option value="">Select mood</option>
+          <option value="8">Good (7–10)</option>
+          <option value="5">Neutral (4–6)</option>
+          <option value="2">Low (1–3)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- RESULT CARD -->
+    <div class="result-card" id="resultCard">
+      <div class="result-top">
+        <div class="result-left">
+          <h3>Burnout Risk</h3>
+          <div class="risk-badge high" id="riskBadge">HIGH</div>
+          <div class="score-bar-wrap">
+            <div class="score-bar-label">
+              <span>Low</span><span>Medium</span><span>High</span>
+            </div>
+            <div class="score-bar"><div class="score-bar-fill" id="scoreBarFill"></div></div>
+          </div>
+        </div>
+        <div class="gauge-wrap">
+          <div class="gauge-container">
+            <svg class="gauge-svg" viewBox="0 0 110 110">
+              <!-- Track -->
+              <path d="M 10 55 A 45 45 0 0 1 100 55" fill="none" stroke="#e8edf4" stroke-width="10" stroke-linecap="round"/>
+              <!-- Colored arc -->
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#22c55e"/>
+                  <stop offset="50%" style="stop-color:#f97316"/>
+                  <stop offset="100%" style="stop-color:#ef4444"/>
+                </linearGradient>
+              </defs>
+              <path d="M 10 55 A 45 45 0 0 1 100 55" fill="none" stroke="url(#gaugeGrad)" stroke-width="10" stroke-linecap="round"/>
+              <!-- Needle -->
+              <g class="gauge-needle" id="gaugeNeedle" style="transform: rotate(-90deg); transform-origin: 55px 55px;">
+                <line x1="55" y1="55" x2="55" y2="16" stroke="#1a2340" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="55" cy="55" r="5" fill="#1a2340"/>
+              </g>
+              <!-- Labels -->
+              <text x="8" y="70" font-size="8" fill="#6b7a99" font-family="Plus Jakarta Sans">1</text>
+              <text x="50" y="14" font-size="8" fill="#6b7a99" font-family="Plus Jakarta Sans" text-anchor="middle">5</text>
+              <text x="97" y="70" font-size="8" fill="#6b7a99" font-family="Plus Jakarta Sans">10</text>
+            </svg>
+          </div>
+          <div class="gauge-value" id="gaugeValue">7.2</div>
+          <div class="gauge-label">/ 10</div>
+        </div>
+      </div>
+
+      <div class="triggers-section">
+        <div class="section-title">⚠️ Main Triggers</div>
+        <div id="triggersList">
+          <div class="trigger-item">Low Sleep, High Exam Pressure</div>
+          <div class="trigger-item">High Screen Time</div>
+        </div>
+      </div>
+
+      <div class="recs-section">
+        <div class="section-title">💡 Recommendations</div>
+        <div id="recsList">
+          <div class="rec-item">Increase sleep to 7 hours</div>
+          <div class="rec-item">Take regular breaks every 45 mins</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="predict-btn" id="predictBtn" onclick="runPrediction()">
+      🔮 Predict Burnout
+    </button>
+  </div>
+
+  <!-- ===== DASHBOARD PAGE ===== -->
+  <div class="page" id="page-dashboard">
+    <div class="page-header">
+      <h2>Dashboard Analytics</h2>
+      <p>Your burnout trends and insights over the past week</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-label">Avg Burnout Score</div>
+        <div class="stat-card-val" style="color:var(--high);">6.8</div>
+        <div class="stat-card-sub">↑ 0.4 from last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Avg Sleep Hours</div>
+        <div class="stat-card-val" style="color:var(--primary);">5.8h</div>
+        <div class="stat-card-sub">↓ 0.6 from last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Risk Level</div>
+        <div class="stat-card-val" style="color:var(--med);">Med-High</div>
+        <div class="stat-card-sub">Monitor closely</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-card-title">
+          Burnout Risk Trend
+          <span class="chip">This Week</span>
+        </div>
+        <div class="chart-wrap" style="height:180px;">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">
+          Risk Distribution
+          <span class="chip">30 Days</span>
+        </div>
+        <div class="chart-wrap" style="height:180px;">
+          <canvas id="donutChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-bottom">
+      <div class="chart-card">
+        <div class="chart-card-title">Sleep vs Stress Level</div>
+        <div class="chart-wrap" style="height:160px;">
+          <canvas id="sleepStressChart"></canvas>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#2d62d4;"></div>Sleep Hours</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f97316;"></div>Stress Level</div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Study Hours vs Burnout</div>
+        <div class="chart-wrap" style="height:160px;">
+          <canvas id="scatterChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HISTORY PAGE ===== -->
+  <div class="page" id="page-history">
+    <div class="page-header">
+      <h2>Activity History</h2>
+      <p>All your past burnout assessments</p>
+    </div>
+
+    <div class="history-filters">
+      <button class="filter-btn active" onclick="filterHistory('all', this)">All</button>
+      <button class="filter-btn" onclick="filterHistory('high', this)">High Risk</button>
+      <button class="filter-btn" onclick="filterHistory('medium', this)">Medium</button>
+      <button class="filter-btn" onclick="filterHistory('low', this)">Low Risk</button>
+      <div class="history-search">
+        <input type="text" placeholder="Search date..." id="historySearch" oninput="searchHistory(this.value)">
+      </div>
+    </div>
+
+    <div class="history-table-card">
+      <table class="history-table" id="historyTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Study Hrs</th>
+            <th>Sleep Hrs</th>
+            <th>Screen Time</th>
+            <th>Burnout Score</th>
+            <th>Risk</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS PAGE ===== -->
+  <div class="page" id="page-settings">
+    <div class="page-header">
+      <h2>Settings</h2>
+      <p>Manage your profile and preferences</p>
+    </div>
+    <div style="background:white;border-radius:14px;padding:28px;box-shadow:var(--shadow);border:1px solid var(--border);max-width:500px;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border);">
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-light));display:flex;align-items:center;justify-content:center;font-size:1.5rem;">👩</div>
+        <div>
+          <div style="font-weight:700;font-size:1rem;color:var(--text);">Priya Sharma</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">CSE · 3rd Year · priya@college.edu</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="form-group"><label>Branch</label><select class="form-select"><option>Computer Science & Engineering</option><option>IT</option><option>ECE</option></select></div>
+        <div class="form-group"><label>Year</label><select class="form-select"><option>3rd Year</option><option>1st Year</option><option>2nd Year</option><option>4th Year</option></select></div>
+        <div class="form-group"><label>Notification Frequency</label><select class="form-select"><option>Daily reminders</option><option>Weekly reminders</option><option>Off</option></select></div>
+        <button class="predict-btn" style="margin-top:8px;">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ========= DATA =========
+const historyData = [
+  { date: 'Mar 14, 2024', study: 8, sleep: 6, screen: 4, score: 7.8, risk: 'high' },
+  { date: 'Mar 13, 2024', study: 7, sleep: 5, screen: 5, score: 5.4, risk: 'medium' },
+  { date: 'Mar 12, 2024', study: 6, sleep: 7, screen: 3, score: 2.9, risk: 'low' },
+  { date: 'Mar 11, 2024', study: 9, sleep: 4, screen: 6, score: 8.3, risk: 'high' },
+  { date: 'Mar 10, 2024', study: 5, sleep: 7, screen: 4, score: 4.7, risk: 'medium' },
+  { date: 'Mar 09, 2024', study: 7, sleep: 6, screen: 7, score: 6.1, risk: 'medium' },
+  { date: 'Mar 08, 2024', study: 4, sleep: 8, screen: 3, score: 2.1, risk: 'low' },
+  { date: 'Mar 07, 2024', study: 10, sleep: 4, screen: 8, score: 9.0, risk: 'high' },
+];
+
+let filteredData = [...historyData];
+let chartInstances = {};
+
+// ========= NAVIGATION =========
+function showPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  btn.classList.add('active');
+
+  const titles = {
+    assessment: ['Home <span>/ Burnout Assessment</span>', 'Daily Check'],
+    dashboard: ['Dashboard <span>/ Analytics</span>', 'This Week'],
+    history: ['Activity <span>/ History</span>', 'All Records'],
+    settings: ['Settings <span>/ Profile</span>', 'Account'],
+  };
+  document.getElementById('topbar-title').innerHTML = titles[page][0];
+  document.getElementById('topbar-badge').textContent = titles[page][1];
+
+  if (page === 'dashboard') initDashboardCharts();
+  if (page === 'history') renderHistory(filteredData);
+}
+
+// ========= PREDICTION ENGINE =========
+function runPrediction() {
+  const study = +document.getElementById('studyHours').value || 5;
+  const sleep = +document.getElementById('sleepHours').value || 6;
+  const screen = +document.getElementById('screenTime').value || 6;
+  const assign = +document.getElementById('assignmentLoad').value || 3;
+  const exam   = +document.getElementById('examPressure').value || 5;
+  const phys   = +document.getElementById('physicalActivity').value || 1;
+  const back   = +document.getElementById('backlogs').value || 0;
+  const mood   = +document.getElementById('moodScore').value || 5;
+
+  const btn = document.getElementById('predictBtn');
+  btn.innerHTML = '<span style="display:flex;align-items:center;justify-content:center;gap:8px;"><span class="dot-pulse"></span><span class="dot-pulse"></span><span class="dot-pulse"></span> Analyzing...</span>';
+  btn.classList.add('loading');
+
+  setTimeout(() => {
+    const score = computeScore(study, sleep, screen, assign, exam, phys, back, mood);
+    displayResult(score, sleep, exam, screen, back, phys);
+    btn.innerHTML = '✅ Re-Run Prediction';
+    btn.classList.remove('loading');
+    addToHistory(study, sleep, screen, score);
+  }, 1500);
+}
+
+function computeScore(study, sleep, screen, assign, exam, phys, back, mood) {
+  let s = 0;
+  s += (10 - sleep) * 0.8;
+  s += back * 1.2;
+  s += exam * 0.55;
+  s += (screen / 12) * 2.5;
+  s += (assign === 5 ? 2 : assign === 3 ? 1 : 0);
+  s += (study > 7 ? 1.5 : study > 5 ? 0.5 : 0);
+  s -= phys * 0.8;
+  s -= (mood / 10) * 1.5;
+  s = Math.max(1, Math.min(10, s * 0.65 + 1.5 + (Math.random() * 0.6 - 0.3)));
+  return Math.round(s * 10) / 10;
+}
+
+function displayResult(score, sleep, exam, screen, back, phys) {
+  // Gauge needle: -90deg = 1, +90deg = 10
+  const angle = ((score - 1) / 9) * 180 - 90;
+  document.getElementById('gaugeNeedle').style.transform = `rotate(${angle}deg)`;
+  document.getElementById('gaugeValue').textContent = score.toFixed(1);
+
+  // Score bar
+  const pct = ((score - 1) / 9) * 100;
+  setTimeout(() => { document.getElementById('scoreBarFill').style.width = pct + '%'; }, 100);
+
+  // Risk badge
+  const badge = document.getElementById('riskBadge');
+  badge.className = 'risk-badge';
+  if (score >= 7) { badge.classList.add('high'); badge.textContent = 'HIGH'; }
+  else if (score >= 4) { badge.classList.add('medium'); badge.textContent = 'MEDIUM'; }
+  else { badge.classList.add('low'); badge.textContent = 'LOW'; }
+
+  // Result card color
+  const card = document.getElementById('resultCard');
+  card.style.borderColor = score >= 7 ? '#fde8e8' : score >= 4 ? '#fef3e2' : '#dcfce7';
+
+  // Triggers
+  const triggers = [];
+  if (sleep <= 5) triggers.push('Critically low sleep (' + sleep + ' hrs)');
+  if (exam >= 7) triggers.push('High exam pressure (level ' + exam + '/10)');
+  if (screen >= 8) triggers.push('Excessive screen time (' + screen + ' hrs)');
+  if (back >= 2) triggers.push(back + ' pending backlogs');
+  if (phys === 0) triggers.push('No physical activity today');
+  if (!triggers.length) triggers.push('Mild academic pressure');
+
+  const tList = document.getElementById('triggersList');
+  tList.innerHTML = triggers.map(t => `<div class="trigger-item">${t}</div>`).join('');
+
+  // Recommendations
+  const recs = [];
+  if (sleep <= 5) recs.push('Aim for 7–8 hrs of sleep — sleep is your #1 tool');
+  if (exam >= 7) recs.push('Break revision into 25-min Pomodoro sessions');
+  if (screen >= 8) recs.push('Reduce screen time by 2 hrs using app limits');
+  if (back >= 1) recs.push('Clear 1 backlog per day to reduce pressure');
+  if (phys === 0) recs.push('Even a 20-min walk lowers cortisol significantly');
+  if (!recs.length) recs.push('Keep up your good habits!', 'Try journaling to stay self-aware');
+
+  const rList = document.getElementById('recsList');
+  rList.innerHTML = recs.map(r => `<div class="rec-item">${r}</div>`).join('');
+}
+
+function addToHistory(study, sleep, screen, score) {
+  const risk = score >= 7 ? 'high' : score >= 4 ? 'medium' : 'low';
+  const today = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  historyData.unshift({ date: today, study, sleep, screen, score, risk });
+  filteredData = [...historyData];
+}
+
+// ========= HISTORY =========
+function renderHistory(data) {
+  const tbody = document.getElementById('historyBody');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">No records found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(row => {
+    const pct = ((row.score - 1) / 9 * 100).toFixed(0);
+    const barColor = row.risk === 'high' ? 'var(--high)' : row.risk === 'medium' ? 'var(--med)' : 'var(--low)';
+    return `
+    <tr>
+      <td style="font-weight:600;">${row.date}</td>
+      <td>${row.study} hrs</td>
+      <td>${row.sleep} hrs</td>
+      <td>${row.screen} hrs</td>
+      <td>
+        <div class="score-cell">
+          <strong>${row.score.toFixed(1)}</strong>
+          <div class="score-mini-bar"><div class="score-mini-fill" style="width:${pct}%;background:${barColor};"></div></div>
+        </div>
+      </td>
+      <td><span class="risk-tag ${row.risk}">${row.risk.charAt(0).toUpperCase() + row.risk.slice(1)}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterHistory(level, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filteredData = level === 'all' ? [...historyData] : historyData.filter(r => r.risk === level);
+  renderHistory(filteredData);
+}
+
+function searchHistory(val) {
+  const base = filteredData.length ? filteredData : historyData;
+  renderHistory(historyData.filter(r => r.date.toLowerCase().includes(val.toLowerCase())));
+}
+
+// ========= CHARTS =========
+function initDashboardCharts() {
+  // Destroy existing
+  Object.values(chartInstances).forEach(c => c.destroy());
+  chartInstances = {};
+
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const burnoutTrend = [3.2, 4.1, 5.0, 5.8, 6.4, 7.2, 8.0];
+
+  // 1. TREND LINE
+  chartInstances.trend = new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: days,
+      datasets: [{
+        label: 'Burnout Score',
+        data: burnoutTrend,
+        borderColor: '#ef4444',
+        backgroundColor: 'rgba(239,68,68,0.08)',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#ef4444',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true,
+        tension: 0.4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min: 0, max: 10, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10, family: 'Plus Jakarta Sans' }, color: '#6b7a99' } },
+        x: { grid: { display: false }, ticks: { font: { size: 10, family: 'Plus Jakarta Sans' }, color: '#6b7a99' } }
+      }
+    }
+  });
+
+  // 2. DONUT
+  chartInstances.donut = new Chart(document.getElementById('donutChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+      datasets: [{
+        data: [20, 45, 35],
+        backgroundColor: ['#22c55e', '#f97316', '#ef4444'],
+        borderWidth: 3,
+        borderColor: '#fff',
+        hoverBorderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { size: 10, family: 'Plus Jakarta Sans' }, color: '#6b7a99', padding: 12, usePointStyle: true, pointStyleWidth: 8 }
+        }
+      }
+    }
+  });
+
+  // 3. BAR — sleep vs stress
+  chartInstances.sleepStress = new Chart(document.getElementById('sleepStressChart'), {
+    type: 'bar',
+    data: {
+      labels: days,
+      datasets: [
+        { label: 'Sleep Hours', data: [7, 6, 5, 6, 5, 4, 6], backgroundColor: '#2d62d4', borderRadius: 4, borderSkipped: false },
+        { label: 'Stress Level', data: [3, 5, 6, 5, 7, 8, 6], backgroundColor: '#f97316', borderRadius: 4, borderSkipped: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { max: 10, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 9, family: 'Plus Jakarta Sans' }, color: '#6b7a99' } },
+        x: { grid: { display: false }, ticks: { font: { size: 9, family: 'Plus Jakarta Sans' }, color: '#6b7a99' } }
+      }
+    }
+  });
+
+  // 4. SCATTER
+  chartInstances.scatter = new Chart(document.getElementById('scatterChart'), {
+    type: 'scatter',
+    data: {
+      datasets: [
+        {
+          label: 'High Risk',
+          data: [{x:8,y:8},{x:9,y:9},{x:7,y:7.5},{x:10,y:9.5},{x:8,y:8.5}],
+          backgroundColor: 'rgba(239,68,68,0.7)', pointRadius: 6, pointHoverRadius: 8,
+        },
+        {
+          label: 'Medium',
+          data: [{x:5,y:5},{x:6,y:5.5},{x:4,y:4},{x:5,y:6},{x:7,y:5}],
+          backgroundColor: 'rgba(249,115,22,0.7)', pointRadius: 6, pointHoverRadius: 8,
+        },
+        {
+          label: 'Low Risk',
+          data: [{x:3,y:2},{x:2,y:3},{x:4,y:2.5},{x:2,y:1.5}],
+          backgroundColor: 'rgba(34,197,94,0.7)', pointRadius: 6, pointHoverRadius: 8,
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 9, family: 'Plus Jakarta Sans' }, color: '#6b7a99', usePointStyle: true, pointStyleWidth: 8, padding: 10 } } },
+      scales: {
+        x: { title: { display: true, text: 'Study Hours', font: { size: 9, family: 'Plus Jakarta Sans' }, color: '#6b7a99' }, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 9 }, color: '#6b7a99' } },
+        y: { title: { display: true, text: 'Burnout', font: { size: 9, family: 'Plus Jakarta Sans' }, color: '#6b7a99' }, min: 0, max: 10, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 9 }, color: '#6b7a99' } }
+      }
+    }
+  });
+}
+
+// ========= INIT =========
+// Set initial gauge
+setTimeout(() => {
+  document.getElementById('gaugeNeedle').style.transform = 'rotate(38deg)';
+  document.getElementById('scoreBarFill').style.width = '70%';
+}, 300);
+
+renderHistory(historyData);
+</script>
+</body>
+</html>

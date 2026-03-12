@@ -1,0 +1,108 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Plus Jakarta Sans',sans-serif;
+}
+
+body{
+background:#eef2f7;
+color:#1a2340;
+}
+
+/* HEADER */
+
+.header{
+height:60px;
+background:white;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 16px;
+border-bottom:1px solid #e2e8f4;
+position:fixed;
+top:0;
+left:0;
+right:0;
+z-index:100;
+}
+
+.logo{
+font-weight:700;
+color:#1e4db7;
+font-size:16px;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+height:60px;
+background:#1e4db7;
+display:flex;
+justify-content:space-around;
+align-items:center;
+}
+
+.nav-item{
+color:white;
+font-size:12px;
+text-align:center;
+cursor:pointer;
+}
+
+/* DESKTOP SIDEBAR */
+
+@media(min-width:768px){
+
+.sidebar{
+top:60px;
+bottom:0;
+width:220px;
+flex-direction:column;
+align-items:flex-start;
+padding:20px;
+height:auto;
+}
+
+.main{
+margin-left:220px;
+margin-top:60px;
+padding:20px;
+}
+
+}
+
+/* MOBILE MAIN */
+
+.main{
+margin-top:60px;
+padding:16px;
+padding-bottom:80px;
+}
+
+/* CARDS */
+
+.card{
+background:white;
+padding:18px;
+border-radius:12px;
+box-shadow:0 4px 20px rgba(0,0,0,0.05);
+margin-bottom:16px;
+}
+
+/* BUTTON */
+
+.btn{
+width:100%;
+padding:14px;
+background:#1e4db7;
+border:none;
+color:white;
+font-weight:600;
+border-radius:10px;
+cursor:pointer;
+}
