@@ -1,56 +1,58 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from "react";
+import { predictBurnout } from "../services/api";
 
 function AssessmentForm(){
 
-const [data,setData] = useState({
+const[form,setForm]=useState({
 
 studyHours:0,
 sleepHours:0,
 screenTime:0,
-assignmentLoad:0,
-examPressure:0,
-physicalActivity:0
+stressLevel:0
 
 });
 
-const handleSubmit = async () => {
+const handleSubmit=async(e)=>{
 
-const res = await axios.post(
-"http://localhost:5000/api/assessment",
-data
-);
+e.preventDefault();
 
-localStorage.setItem("result",JSON.stringify(res.data));
+const res = await predictBurnout(form);
 
-window.location="/results";
+console.log(res.data);
 
-};
+}
 
 return(
 
 <div>
 
-<h2>Burnout Assessment</h2>
+<h2>Assessment Form</h2>
 
-<input
-placeholder="Study Hours"
-onChange={(e)=>setData({...data,studyHours:e.target.value})}
+<form onSubmit={handleSubmit}>
+
+<label>Study Hours</label>
+<input type="number"
+onChange={(e)=>setForm({...form,studyHours:e.target.value})}
 />
 
-<input
-placeholder="Sleep Hours"
-onChange={(e)=>setData({...data,sleepHours:e.target.value})}
+<label>Sleep Hours</label>
+<input type="number"
+onChange={(e)=>setForm({...form,sleepHours:e.target.value})}
 />
 
-<input
-placeholder="Screen Time"
-onChange={(e)=>setData({...data,screenTime:e.target.value})}
+<label>Screen Time</label>
+<input type="number"
+onChange={(e)=>setForm({...form,screenTime:e.target.value})}
 />
 
-<button onClick={handleSubmit}>
-Predict Burnout
-</button>
+<label>Stress Level</label>
+<input type="number"
+onChange={(e)=>setForm({...form,stressLevel:e.target.value})}
+/>
+
+<button>Predict Burnout</button>
+
+</form>
 
 </div>
 
@@ -58,4 +60,4 @@ Predict Burnout
 
 }
 
-export default AssessmentForm;
+export default AssessmentForm

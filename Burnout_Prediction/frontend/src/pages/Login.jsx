@@ -1,44 +1,48 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from "react";
+import { loginUser } from "../services/api";
 
-function Login() {
+function Login(){
 
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
+const[email,setEmail]=useState("");
+const[password,setPassword]=useState("");
 
-  const handleLogin = async () => {
+const handleLogin=async(e)=>{
 
-    const res = await axios.post(
-      "http://localhost:5000/api/login",
-      {email,password}
-    );
+e.preventDefault();
 
-    localStorage.setItem("token",res.data.token);
+await loginUser({email,password});
 
-    window.location="/dashboard";
-  };
-
-  return (
-
-    <div className="login">
-
-      <h2>Login</h2>
-
-      <input
-      placeholder="Email"
-      onChange={(e)=>setEmail(e.target.value)}
-      />
-
-      <input
-      type="password"
-      placeholder="Password"
-      onChange={(e)=>setPassword(e.target.value)}
-      />
-
-      <button onClick={handleLogin}>Login</button>
-
-    </div>
-  );
 }
 
-export default Login;
+return(
+
+<div className="login">
+
+<h2>Login</h2>
+
+<form onSubmit={handleLogin}>
+
+<input
+placeholder="Email"
+value={email}
+onChange={(e)=>setEmail(e.target.value)}
+/>
+
+<input
+type="password"
+placeholder="Password"
+value={password}
+onChange={(e)=>setPassword(e.target.value)}
+/>
+
+<button>Login</button>
+
+</form>
+
+</div>
+
+)
+
+}
+
+export default Login

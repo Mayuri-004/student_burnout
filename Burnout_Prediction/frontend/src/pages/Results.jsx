@@ -1,18 +1,28 @@
-import React from "react";
+import { Bar } from "react-chartjs-2";
 
 function Results(){
 
-const result = JSON.parse(localStorage.getItem("result"));
+const data = {
+
+labels:["Sleep","Screen Time","Study Hours"],
+
+datasets:[{
+
+label:"Impact",
+
+data:[8,6,5]
+
+}]
+
+}
 
 return(
 
 <div>
 
-<h2>Burnout Score</h2>
+<h2>Burnout Results</h2>
 
-<h1>{result.score}</h1>
-
-<p>Risk Level: {result.risk}</p>
+<Bar data={data}/>
 
 </div>
 
@@ -20,4 +30,4 @@ return(
 
 }
 
-export default Results;
+export default Results

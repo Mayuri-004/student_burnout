@@ -1,14 +1,17 @@
-import React, {useEffect,useState} from "react";
-import axios from "axios";
+import { useEffect,useState } from "react";
+import { getHistory } from "../services/api";
 
 function History(){
 
-const [history,setHistory] = useState([]);
+const[data,setData]=useState([]);
 
 useEffect(()=>{
 
-axios.get("http://localhost:5000/api/history")
-.then(res=>setHistory(res.data));
+getHistory().then(res=>{
+
+setData(res.data)
+
+})
 
 },[])
 
@@ -20,29 +23,19 @@ return(
 
 <table>
 
-<thead>
-
 <tr>
 <th>Date</th>
 <th>Score</th>
 <th>Risk</th>
 </tr>
 
-</thead>
-
-<tbody>
-
-{history.map((item)=>(
-<tr key={item._id}>
-
+{data.map((item)=>(
+<tr key={item.id}>
 <td>{item.date}</td>
 <td>{item.score}</td>
 <td>{item.risk}</td>
-
 </tr>
 ))}
-
-</tbody>
 
 </table>
 
@@ -52,4 +45,4 @@ return(
 
 }
 
-export default History;
+export default History

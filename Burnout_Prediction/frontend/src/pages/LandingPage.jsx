@@ -1,33 +1,34 @@
-import React from "react";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 
-function LandingPage() {
+function LandingPage(){
 
-  return (
+return(
 
-    <div>
+<div>
 
-      <Navbar/>
+<Navbar/>
 
-      <section className="hero">
+<section className="hero">
 
-        <h1>AI Powered Student Burnout Detection</h1>
+<h1>Student Mental Burnout Prediction</h1>
 
-        <p>
-        Detect mental burnout early using machine learning
-        and behavioral analytics
-        </p>
+<p>
+AI powered system to detect early burnout symptoms
+</p>
 
-        <Link to="/login">
-        <button>Start Assessment</button>
-        </Link>
+<Link to="/assessment">
 
-      </section>
+<button>Start Assessment</button>
 
-    </div>
+</Link>
 
-  );
+</section>
+
+</div>
+
+)
+
 }
 
-export default LandingPage;
+export default LandingPage
