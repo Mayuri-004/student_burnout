@@ -4,7 +4,9 @@ const LandingPage = ({ onNav }) => (
     <nav className="navbar">
       <div className="navbar-logo">🧠 BurnoutAI</div>
       <div className="navbar-links">
-        <a>Home</a><a>Features</a><a>How It Works</a>
+        <a onClick={() => scrollToSection("home")}>Home</a>
+<a onClick={() => scrollToSection("features")}>Features</a>
+<a onClick={() => scrollToSection("how")}>How It Works</a>
         <button className="btn btn-outline" onClick={() => onNav("login")}>Login</button>
         <button className="btn btn-primary" onClick={() => onNav("login")}>Start Assessment</button>
       </div>
