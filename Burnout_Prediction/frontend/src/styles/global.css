@@ -372,3 +372,43 @@ margin-top:1rem;
 .main-content{
   padding:20px;
 }
+/* DARK MODE */
+
+body.dark-mode {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+/* cards */
+
+body.dark-mode .card,
+body.dark-mode .settings-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+/* sidebar */
+
+body.dark-mode .settings-sidebar {
+  background: #1e293b;
+}
+
+/* inputs */
+
+body.dark-mode .form-input {
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+}
+
+/* buttons */
+
+body.dark-mode .btn-primary {
+  background: #2563eb;
+}
+
+/* topbar */
+
+body.dark-mode .topbar {
+  background: #1e293b;
+}
