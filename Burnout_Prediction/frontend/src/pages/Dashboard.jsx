@@ -1,141 +1,218 @@
-import { useEffect, useState } from "react";
 import AppLayout from "../components/AppLayout";
 import ScoreRing from "../components/ScoringRing";
 import TrendChart from "../components/TrendChart";
 
 const DashboardPage = ({ onNav, onLogout }) => {
 
-  const [data,setData] = useState(null);
+  const handleNotifications = () => {
+    onNav("notifications");
+  };
 
-  useEffect(()=>{
-    fetch("http://localhost:5000/api/dashboard")
-    .then(res=>res.json())
-    .then(result=>setData(result))
-  },[]);
-
-  if(!data){
-    return <div>Loading dashboard...</div>
-  }
-
-  const riskColor =
-  data.riskLevel==="High" ? "#ef4444" :
-  data.riskLevel==="Medium" ? "#f97316" :
-  "#22c55e";
+  const handleProfile = () => {
+    onNav("settings");
+  };
 
   return (
+    <AppLayout active="dashboard" onNav={onNav} onLogout={onLogout}>
 
-<AppLayout active="dashboard" onNav={onNav} onLogout={onLogout}>
+      {/* TOP BAR */}
 
-<div className="topbar">
-<div className="topbar-greeting">
-Welcome back, Student 👋
-</div>
-</div>
+      <div className="topbar">
+        <div className="topbar-greeting">
+          Welcome back, Student! 👋
+        </div>
 
-<div className="page-content">
+        <div className="topbar-right">
 
-<div className="grid-3">
+          <button
+            className="notif-btn"
+            onClick={handleNotifications}
+          >
+            🔔 Notifications
+          </button>
 
-{/* Burnout Score */}
+          <div
+            className="avatar"
+            onClick={handleProfile}
+            style={{ cursor: "pointer" }}
+          >
+            S
+          </div>
 
-<div className="card">
+        </div>
+      </div>
 
-<div className="card-title">Burnout Score</div>
+      {/* PAGE CONTENT */}
 
-<ScoreRing score={data.burnoutScore} color={riskColor} />
+      <div className="page-content">
 
-<div style={{textAlign:"center"}}>
+        {/* TOP GRID */}
 
-<span className={`risk-badge risk-${data.riskLevel.toLowerCase()}`}>
-{data.riskLevel} Risk
-</span>
+        <div className="grid-3">
 
-</div>
+          {/* SCORE */}
 
-</div>
+          <div className="card">
+            <div className="card-title">Burnout Score</div>
 
+            <ScoreRing score={7.4} color="#ef4444" />
 
-{/* Factors */}
+            <div style={{ textAlign: "center" }}>
+              <span className="risk-badge risk-high">
+                🔴 High Risk
+              </span>
+            </div>
+          </div>
 
-<div className="card">
+          {/* FACTORS */}
 
-<div className="card-title">Key Factors</div>
+          <div className="card">
+            <div className="card-title">Key Factors</div>
 
-{Object.entries(data.factors).map(([key,value])=>(
-<div className="factor-row" key={key}>
+            {[
+              { label:"Sleep", pct:85, cls:"bar-red", level:"High", c:"#ef4444" },
+              { label:"Screen Time", pct:80, cls:"bar-orange", level:"High", c:"#f97316" },
+              { label:"Study Hours", pct:55, cls:"bar-yellow", level:"Medium", c:"#eab308" },
+              { label:"Exam Pressure", pct:50, cls:"bar-yellow", level:"Medium", c:"#eab308" },
+            ].map((f, i) => (
 
-<span className="factor-label">{key}</span>
+              <div className="factor-row" key={i}>
 
-<div className="factor-bar-bg">
+                <span className="factor-label">{f.label}</span>
 
-<div className="factor-bar"
-style={{width:`${value}%`}}/>
+                <div className="factor-bar-bg">
+                  <div
+                    className={`factor-bar ${f.cls}`}
+                    style={{ width: `${f.pct}%` }}
+                  />
+                </div>
 
-</div>
+                <span
+                  className="bar-level"
+                  style={{ color: f.c }}
+                >
+                  {f.level}
+                </span>
 
-</div>
-))}
+              </div>
 
-</div>
+            ))}
+          </div>
 
+          {/* RECOMMENDATIONS */}
 
-{/* Recommendations */}
+          <div className="card">
 
-<div className="card">
+            <div className="card-title">
+              Recommendations
+            </div>
 
-<div className="card-title">Recommendations</div>
+            {[
+              { icon:"😴", cls:"rec-blue", title:"Improve sleep schedule", desc:"Try 7–8 hours of sleep every night." },
+              { icon:"📵", cls:"rec-teal", title:"Reduce screen time", desc:"Limit non-academic usage before bed." },
+              { icon:"⏱️", cls:"rec-green", title:"Take study breaks", desc:"Use Pomodoro technique (25/5 rule)." },
+              { icon:"🏃", cls:"rec-orange", title:"Exercise regularly", desc:"Try 30 minutes of physical activity." },
+            ].map((r, i) => (
 
-{data.recommendations.map((r,i)=>(
-<div className="rec-item" key={i}>
+              <div className="rec-item" key={i}>
 
-<div className="rec-icon">💡</div>
+                <div className={`rec-icon ${r.cls}`}>
+                  {r.icon}
+                </div>
 
-<div className="rec-text">{r}</div>
+                <div className="rec-text">
+                  <strong>{r.title}</strong>
+                  {r.desc}
+                </div>
 
-</div>
-))}
+              </div>
 
-</div>
+            ))}
+          </div>
 
-</div>
+        </div>
 
+        {/* BOTTOM GRID */}
 
-{/* Trend */}
+        <div className="grid-2">
 
-<div className="grid-2">
+          {/* TREND */}
 
-<div className="card">
+          <div className="card">
 
-<div className="card-title">Burnout Trend</div>
+            <div className="card-title">
+              Burnout Trend (Last 4 Weeks)
+            </div>
 
-<TrendChart data={data.trend}/>
+            <TrendChart />
 
-</div>
+            <div
+              style={{
+                display:"flex",
+                justifyContent:"space-between",
+                fontSize:".72rem",
+                color:"var(--muted)",
+                marginTop:".5rem"
+              }}
+            >
+              {["Week 1","Week 2","Week 3","Week 4"].map(w =>
+                <span key={w}>{w}</span>
+              )}
+            </div>
 
+          </div>
 
-<div className="card">
+          {/* QUICK ACTIONS */}
 
-<div className="card-title">Quick Actions</div>
+          <div className="card">
 
-<button className="qa-btn qa-primary"
-onClick={()=>onNav("assessment")}>
-Start New Assessment
-</button>
+            <div className="card-title">
+              Quick Actions
+            </div>
 
-<button className="qa-btn qa-secondary"
-onClick={()=>onNav("history")}>
-View History
-</button>
+            <button
+              className="qa-btn qa-primary"
+              onClick={() => onNav("assessment")}
+            >
+              ➕ Start New Assessment
+            </button>
 
-</div>
+            <button
+              className="qa-btn qa-secondary"
+              onClick={() => onNav("history")}
+            >
+              🕘 View History
+            </button>
 
-</div>
+            <button
+              className="qa-btn qa-secondary"
+              onClick={() => onNav("results")}
+            >
+              📈 View Results
+            </button>
 
-</div>
+            <button
+              className="qa-btn qa-secondary"
+              onClick={() => onNav("settings")}
+            >
+              ⚙️ Settings
+            </button>
 
-</AppLayout>
+            <button
+              className="qa-btn qa-danger"
+              onClick={onLogout}
+            >
+              🚪 Logout
+            </button>
 
-)
+          </div>
+
+        </div>
+
+      </div>
+
+    </AppLayout>
+  );
 };
 
 export default DashboardPage;
