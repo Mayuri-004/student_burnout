@@ -1,22 +1,17 @@
-import { Link } from "react-router-dom";
+export default function SliderRow({ label, value, setValue }) {
+  return (
+    <div className="slider-row">
+      <label>{label}</label>
 
-function Sidebar(){
+      <input
+        type="range"
+        min="1"
+        max="10"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
 
-return(
-
-<div className="sidebar">
-
-<h3>Menu</h3>
-
-<Link to="/dashboard">Dashboard</Link>
-<Link to="/assessment">Assessment</Link>
-<Link to="/results">Results</Link>
-<Link to="/history">History</Link>
-
-</div>
-
-)
-
+      <span>{value}</span>
+    </div>
+  );
 }
-
-export default Sidebar
