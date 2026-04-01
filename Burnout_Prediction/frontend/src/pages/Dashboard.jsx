@@ -1,6 +1,6 @@
 import AppLayout from "../components/AppLayout";
-import ScoreRing from "./components/ScoreRing";
-import TrendChart from "./components/TrendChart";
+import ScoreRing from "../components/ScoreRing";
+import TrendChart from "../components/TrendChart";
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 const DashboardPage = ({ onNav, onLogout }) => (
