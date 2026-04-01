@@ -1,3 +1,4 @@
+import Footer from "../components/Footer";
 const LandingPage = ({ onNav }) => (
   <div>
     <nav className="navbar">
