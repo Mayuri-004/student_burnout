@@ -1,3 +1,4 @@
+import AppLayout from "../components/AppLayout";
 const SettingsPage = ({ onNav, onLogout }) => (
   <AppLayout active="settings" onNav={onNav} onLogout={onLogout}>
     <div className="topbar"><div className="topbar-greeting">Settings</div></div>
