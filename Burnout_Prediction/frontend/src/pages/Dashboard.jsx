@@ -1,75 +1,141 @@
+import { useEffect, useState } from "react";
 import AppLayout from "../components/AppLayout";
 import ScoreRing from "../components/ScoringRing";
 import TrendChart from "../components/TrendChart";
 
-// ── DASHBOARD ─────────────────────────────────────────────────────────────────
-const DashboardPage = ({ onNav, onLogout }) => (
-  <AppLayout active="dashboard" onNav={onNav} onLogout={onLogout}>
-    <div className="topbar">
-      <div className="topbar-greeting">Welcome back, Student! 👋</div>
-      <div className="topbar-right">
-        <button className="notif-btn">🔔 Notifications</button>
-        <div className="avatar">S</div>
-      </div>
-    </div>
-    <div className="page-content">
-      <div className="grid-3">
-        <div className="card">
-          <div className="card-title">Burnout Score</div>
-          <ScoreRing score={7.4} color="#ef4444" />
-          <div style={{ textAlign:"center" }}>
-            <span className="risk-badge risk-high">🔴 High Risk</span>
-          </div>
-        </div>
-        <div className="card">
-          <div className="card-title">Key Factors</div>
-          {[
-            { label:"Sleep",         pct:85, cls:"bar-red",    level:"High",   c:"#ef4444" },
-            { label:"Screen Time",   pct:80, cls:"bar-orange", level:"High",   c:"#f97316" },
-            { label:"Study Hours",   pct:55, cls:"bar-yellow", level:"Medium", c:"#eab308" },
-            { label:"Exam Pressure", pct:50, cls:"bar-yellow", level:"Medium", c:"#eab308" },
-          ].map((f, i) => (
-            <div className="factor-row" key={i}>
-              <span className="factor-label">{f.label}</span>
-              <div className="factor-bar-bg">
-                <div className={`factor-bar ${f.cls}`} style={{ width:`${f.pct}%` }} />
-              </div>
-              <span className="bar-level" style={{ color:f.c }}>{f.level}</span>
-            </div>
-          ))}
-        </div>
-        <div className="card">
-          <div className="card-title">Recommendations</div>
-          {[
-            { icon:"😴", cls:"rec-blue",   title:"Improve sleep schedule", desc:"Try 7–8 hours of sleep every night." },
-            { icon:"📵", cls:"rec-teal",   title:"Reduce screen time",     desc:"Limit non-academic usage before bed." },
-            { icon:"⏱️", cls:"rec-green",  title:"Take study breaks",      desc:"Use Pomodoro technique (25/5 rule)." },
-            { icon:"🏃", cls:"rec-orange", title:"Exercise regularly",     desc:"Try 30 minutes of physical activity." },
-          ].map((r, i) => (
-            <div className="rec-item" key={i}>
-              <div className={`rec-icon ${r.cls}`}>{r.icon}</div>
-              <div className="rec-text"><strong>{r.title}</strong>{r.desc}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="grid-2">
-        <div className="card">
-          <div className="card-title">Burnout Trend (Last 4 Weeks)</div>
-          <TrendChart />
-          <div style={{ display:"flex", justifyContent:"space-between", fontSize:".72rem", color:"var(--muted)", marginTop:".5rem" }}>
-            {["Week 1","Week 2","Week 3","Week 4"].map(w => <span key={w}>{w}</span>)}
-          </div>
-        </div>
-        <div className="card">
-          <div className="card-title">Quick Actions</div>
-          <button className="qa-btn qa-primary"    onClick={() => onNav("assessment")}>➕ Start New Assessment</button>
-          <button className="qa-btn qa-secondary"  onClick={() => onNav("history")}>🕘 View History</button>
-          <button className="qa-btn qa-secondary"  onClick={() => onNav("results")}>📈 View Results</button>
-        </div>
-      </div>
-    </div>
-  </AppLayout>
-);
+const DashboardPage = ({ onNav, onLogout }) => {
+
+  const [data,setData] = useState(null);
+
+  useEffect(()=>{
+    fetch("http://localhost:5000/api/dashboard")
+    .then(res=>res.json())
+    .then(result=>setData(result))
+  },[]);
+
+  if(!data){
+    return <div>Loading dashboard...</div>
+  }
+
+  const riskColor =
+  data.riskLevel==="High" ? "#ef4444" :
+  data.riskLevel==="Medium" ? "#f97316" :
+  "#22c55e";
+
+  return (
+
+<AppLayout active="dashboard" onNav={onNav} onLogout={onLogout}>
+
+<div className="topbar">
+<div className="topbar-greeting">
+Welcome back, Student 👋
+</div>
+</div>
+
+<div className="page-content">
+
+<div className="grid-3">
+
+{/* Burnout Score */}
+
+<div className="card">
+
+<div className="card-title">Burnout Score</div>
+
+<ScoreRing score={data.burnoutScore} color={riskColor} />
+
+<div style={{textAlign:"center"}}>
+
+<span className={`risk-badge risk-${data.riskLevel.toLowerCase()}`}>
+{data.riskLevel} Risk
+</span>
+
+</div>
+
+</div>
+
+
+{/* Factors */}
+
+<div className="card">
+
+<div className="card-title">Key Factors</div>
+
+{Object.entries(data.factors).map(([key,value])=>(
+<div className="factor-row" key={key}>
+
+<span className="factor-label">{key}</span>
+
+<div className="factor-bar-bg">
+
+<div className="factor-bar"
+style={{width:`${value}%`}}/>
+
+</div>
+
+</div>
+))}
+
+</div>
+
+
+{/* Recommendations */}
+
+<div className="card">
+
+<div className="card-title">Recommendations</div>
+
+{data.recommendations.map((r,i)=>(
+<div className="rec-item" key={i}>
+
+<div className="rec-icon">💡</div>
+
+<div className="rec-text">{r}</div>
+
+</div>
+))}
+
+</div>
+
+</div>
+
+
+{/* Trend */}
+
+<div className="grid-2">
+
+<div className="card">
+
+<div className="card-title">Burnout Trend</div>
+
+<TrendChart data={data.trend}/>
+
+</div>
+
+
+<div className="card">
+
+<div className="card-title">Quick Actions</div>
+
+<button className="qa-btn qa-primary"
+onClick={()=>onNav("assessment")}>
+Start New Assessment
+</button>
+
+<button className="qa-btn qa-secondary"
+onClick={()=>onNav("history")}>
+View History
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</AppLayout>
+
+)
+};
 
 export default DashboardPage;
