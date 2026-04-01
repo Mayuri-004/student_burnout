@@ -1,6 +1,6 @@
 import AppLayout from "../components/AppLayout";
 import SliderRow from "../components/SliderRow";
-
+import { useState } from "react";
 const AssessmentPage = ({ onNav, onLogout }) => {
   const [step, setStep] = useState(1);
   const [vals, setVals] = useState({
