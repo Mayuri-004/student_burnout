@@ -1,42 +1,75 @@
-import Sidebar from "../components/Sidebar";
+import AppLayout from "../components/AppLayout";
+import ScoreRing from "../components/ScoreRing";
+import TrendChart from "../components/TrendChart";
 
-function Dashboard(){
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+const DashboardPage = ({ onNav, onLogout }) => (
+  <AppLayout active="dashboard" onNav={onNav} onLogout={onLogout}>
+    <div className="topbar">
+      <div className="topbar-greeting">Welcome back, Student! 👋</div>
+      <div className="topbar-right">
+        <button className="notif-btn">🔔 Notifications</button>
+        <div className="avatar">S</div>
+      </div>
+    </div>
+    <div className="page-content">
+      <div className="grid-3">
+        <div className="card">
+          <div className="card-title">Burnout Score</div>
+          <ScoreRing score={7.4} color="#ef4444" />
+          <div style={{ textAlign:"center" }}>
+            <span className="risk-badge risk-high">🔴 High Risk</span>
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-title">Key Factors</div>
+          {[
+            { label:"Sleep",         pct:85, cls:"bar-red",    level:"High",   c:"#ef4444" },
+            { label:"Screen Time",   pct:80, cls:"bar-orange", level:"High",   c:"#f97316" },
+            { label:"Study Hours",   pct:55, cls:"bar-yellow", level:"Medium", c:"#eab308" },
+            { label:"Exam Pressure", pct:50, cls:"bar-yellow", level:"Medium", c:"#eab308" },
+          ].map((f, i) => (
+            <div className="factor-row" key={i}>
+              <span className="factor-label">{f.label}</span>
+              <div className="factor-bar-bg">
+                <div className={`factor-bar ${f.cls}`} style={{ width:`${f.pct}%` }} />
+              </div>
+              <span className="bar-level" style={{ color:f.c }}>{f.level}</span>
+            </div>
+          ))}
+        </div>
+        <div className="card">
+          <div className="card-title">Recommendations</div>
+          {[
+            { icon:"😴", cls:"rec-blue",   title:"Improve sleep schedule", desc:"Try 7–8 hours of sleep every night." },
+            { icon:"📵", cls:"rec-teal",   title:"Reduce screen time",     desc:"Limit non-academic usage before bed." },
+            { icon:"⏱️", cls:"rec-green",  title:"Take study breaks",      desc:"Use Pomodoro technique (25/5 rule)." },
+            { icon:"🏃", cls:"rec-orange", title:"Exercise regularly",     desc:"Try 30 minutes of physical activity." },
+          ].map((r, i) => (
+            <div className="rec-item" key={i}>
+              <div className={`rec-icon ${r.cls}`}>{r.icon}</div>
+              <div className="rec-text"><strong>{r.title}</strong>{r.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="grid-2">
+        <div className="card">
+          <div className="card-title">Burnout Trend (Last 4 Weeks)</div>
+          <TrendChart />
+          <div style={{ display:"flex", justifyContent:"space-between", fontSize:".72rem", color:"var(--muted)", marginTop:".5rem" }}>
+            {["Week 1","Week 2","Week 3","Week 4"].map(w => <span key={w}>{w}</span>)}
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-title">Quick Actions</div>
+          <button className="qa-btn qa-primary"    onClick={() => onNav("assessment")}>➕ Start New Assessment</button>
+          <button className="qa-btn qa-secondary"  onClick={() => onNav("history")}>🕘 View History</button>
+          <button className="qa-btn qa-secondary"  onClick={() => onNav("results")}>📈 View Results</button>
+        </div>
+      </div>
+    </div>
+  </AppLayout>
+);
 
-return(
-
-<div className="dashboard">
-
-<Sidebar/>
-
-<div className="content">
-
-<h2>Dashboard</h2>
-
-<div className="cards">
-
-<div className="card">
-<h3>Burnout Score</h3>
-<p>7.4 / 10</p>
-</div>
-
-<div className="card">
-<h3>Sleep Hours</h3>
-<p>5 hrs</p>
-</div>
-
-<div className="card">
-<h3>Screen Time</h3>
-<p>6 hrs</p>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-)
-
-}
-
-export default Dashboard
+export default DashboardPage;

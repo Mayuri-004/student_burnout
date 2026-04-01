@@ -1,17 +1,10 @@
-export default function SliderRow({ label, value, setValue }) {
-  return (
-    <div className="slider-row">
-      <label>{label}</label>
+const SliderRow = ({ label, value, onChange, unit }) => (
+  <div className="slider-row">
+    <span className="slider-label">{label}</span>
+    <input className="slider-input" type="range" min={0} max={10} step={0.5} value={value}
+      onChange={e => onChange(parseFloat(e.target.value))} />
+    <span className="slider-val">{unit === "hrs" ? `${value} hrs` : `${value} / 10`}</span>
+  </div>
+);
 
-      <input
-        type="range"
-        min="1"
-        max="10"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
-
-      <span>{value}</span>
-    </div>
-  );
-}
+export default SliderRow;
