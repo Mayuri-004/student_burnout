@@ -20,7 +20,11 @@ const LandingPage = ({ onNav }) => (
           <p>Early detection of mental burnout using behavioral analytics and machine learning. Get personalized insights to improve your well-being.</p>
           <div className="hero-actions">
             <button className="btn btn-primary btn-lg" onClick={() => onNav("login")}>Take Assessment</button>
-            <button className="btn btn-secondary btn-lg">Learn More</button>
+              <button 
+    className="btn btn-secondary btn-lg"
+    onClick={() => scrollToSection("features")}>
+    Learn More
+  </button>
           </div>
         </div>
         <div className="hero-visual"><span className="hero-icon">🧠</span></div>
