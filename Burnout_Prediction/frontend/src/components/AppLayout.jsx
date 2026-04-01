@@ -1,25 +1,30 @@
-import { Outlet, Link } from "react-router-dom";
-import Footer from "./Footer";
-
-export default function AppLayout() {
+const AppLayout = ({ active, onNav, onLogout, children }) => {
+  const items = [
+    { id:"dashboard", icon:"🏠", label:"Dashboard" },
+    { id:"assessment", icon:"📋", label:"Assessment" },
+    { id:"results",    icon:"📈", label:"Results" },
+    { id:"history",    icon:"🕘", label:"History" },
+    { id:"settings",   icon:"⚙️", label:"Settings" },
+  ];
   return (
-    <div className="layout">
-      <nav className="navbar">
-        <h2>Burnout Detector</h2>
-
-        <div className="nav-links">
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/assessment">Assessment</Link>
-          <Link to="/history">History</Link>
-          <Link to="/settings">Settings</Link>
+    <div className="app-layout">
+      <aside className="sidebar">
+        <div className="sidebar-header">🧠 BurnoutAI</div>
+        <div className="sidebar-nav">
+          {items.map(it => (
+            <div key={it.id}
+              className={`sidebar-item ${active === it.id ? "active" : ""}`}
+              onClick={() => onNav(it.id)}>
+              <span>{it.icon}</span>{it.label}
+            </div>
+          ))}
         </div>
-      </nav>
-
-      <main className="content">
-        <Outlet />
-      </main>
-
-      <Footer />
+        <div className="sidebar-footer">
+          <button className="logout-btn" onClick={onLogout}>🚪 Logout</button>
+        </div>
+      </aside>
+      <div className="main-content">{children}</div>
     </div>
   );
-}
+};
+export default AppLayout;
