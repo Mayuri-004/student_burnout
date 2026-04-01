@@ -21,18 +21,14 @@ const Settings = ({ onNav, onLogout }) => {
 
   // SETTINGS STATE
   const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(
+  localStorage.getItem("darkMode") === "true"
+);
 
   const [message, setMessage] = useState("");
 
   // APPLY DARK MODE
-  useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add("dark-mode");
-    } else {
-      document.body.classList.remove("dark-mode");
-    }
-  }, [darkMode]);
+  
 
   // SAVE PROFILE
   const handleSaveProfile = () => {
