@@ -1,142 +1,256 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppLayout from "../components/AppLayout";
 
 const Settings = ({ onNav, onLogout }) => {
 
+  // ACTIVE SETTINGS TAB
+  const [activeTab, setActiveTab] = useState("profile");
+
+  // PROFILE STATE
+  const [name, setName] = useState("Student User");
+  const [email, setEmail] = useState("student@example.com");
+  const [institution, setInstitution] = useState("State University");
+
+  // PASSWORD STATE
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  // SETTINGS STATE
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
 
+  const [message, setMessage] = useState("");
+
+  // APPLY DARK MODE
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+  }, [darkMode]);
+
+  // SAVE PROFILE
+  const handleSaveProfile = () => {
+    console.log({ name, email, institution });
+    setMessage("Profile updated successfully ✅");
+  };
+
+  // UPDATE PASSWORD
+  const handlePasswordUpdate = () => {
+
+    if (!currentPassword || !newPassword) {
+      setMessage("Please fill all password fields ⚠️");
+      return;
+    }
+
+    console.log({ currentPassword, newPassword });
+
+    setCurrentPassword("");
+    setNewPassword("");
+
+    setMessage("Password updated successfully 🔐");
+  };
+
   return (
     <AppLayout active="settings" onNav={onNav} onLogout={onLogout}>
-      
+
       <div className="topbar">
         <div className="topbar-greeting">Settings</div>
       </div>
 
       <div className="page-content settings-container">
 
-        {/* LEFT SETTINGS MENU */}
+        {/* SETTINGS MENU */}
 
         <div className="settings-sidebar">
 
-          <div className="settings-menu-item active">Profile</div>
-          <div className="settings-menu-item">Account</div>
-          <div className="settings-menu-item">Security</div>
-          <div className="settings-menu-item">Notifications</div>
-          <div className="settings-menu-item">Preferences</div>
+          <div
+            className={`settings-menu-item ${activeTab==="profile"?"active":""}`}
+            onClick={() => setActiveTab("profile")}
+          >
+            Profile
+          </div>
+
+          <div
+            className={`settings-menu-item ${activeTab==="security"?"active":""}`}
+            onClick={() => setActiveTab("security")}
+          >
+            Security
+          </div>
+
+          <div
+            className={`settings-menu-item ${activeTab==="notifications"?"active":""}`}
+            onClick={() => setActiveTab("notifications")}
+          >
+            Notifications
+          </div>
+
+          <div
+            className={`settings-menu-item ${activeTab==="preferences"?"active":""}`}
+            onClick={() => setActiveTab("preferences")}
+          >
+            Preferences
+          </div>
 
         </div>
 
-        {/* RIGHT SETTINGS PANEL */}
+        {/* SETTINGS PANEL */}
 
         <div className="settings-panel">
 
-          {/* PROFILE SECTION */}
+          {message && (
+            <div className="settings-message">
+              {message}
+            </div>
+          )}
 
-          <div className="settings-card">
+          {/* PROFILE */}
 
-            <div className="card-title">Profile Information</div>
+          {activeTab === "profile" && (
 
-            <div className="profile-row">
+            <div className="settings-card">
 
-              <div className="avatar">
-                <span>SU</span>
+              <div className="card-title">Profile Information</div>
+
+              <div className="profile-row">
+
+                <div className="avatar">
+                  {name.charAt(0)}
+                </div>
+
+                <button className="btn btn-primary">
+                  Upload Photo
+                </button>
+
               </div>
 
-              <div>
-                <button className="btn btn-primary">Upload Photo</button>
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  className="form-input"
+                  value={name}
+                  onChange={(e)=>setName(e.target.value)}
+                />
               </div>
 
+              <div className="form-group">
+                <label>Email Address</label>
+                <input
+                  className="form-input"
+                  value={email}
+                  onChange={(e)=>setEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Institution</label>
+                <input
+                  className="form-input"
+                  value={institution}
+                  onChange={(e)=>setInstitution(e.target.value)}
+                />
+              </div>
+
+              <button
+                className="btn btn-primary save-btn"
+                onClick={handleSaveProfile}
+              >
+                Save Changes
+              </button>
+
             </div>
-
-            <div className="form-group">
-              <label>Full Name</label>
-              <input className="form-input" defaultValue="Student User" />
-            </div>
-
-            <div className="form-group">
-              <label>Email Address</label>
-              <input className="form-input" defaultValue="student@example.com" />
-            </div>
-
-            <div className="form-group">
-              <label>Institution</label>
-              <input className="form-input" defaultValue="State University" />
-            </div>
-
-            <button className="btn btn-primary save-btn">
-              Save Changes
-            </button>
-
-          </div>
+          )}
 
           {/* SECURITY */}
 
-          <div className="settings-card">
+          {activeTab === "security" && (
 
-            <div className="card-title">Security</div>
+            <div className="settings-card">
 
-            <div className="form-group">
-              <label>Current Password</label>
-              <input type="password" className="form-input" />
+              <div className="card-title">Security</div>
+
+              <div className="form-group">
+                <label>Current Password</label>
+                <input
+                  type="password"
+                  className="form-input"
+                  value={currentPassword}
+                  onChange={(e)=>setCurrentPassword(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>New Password</label>
+                <input
+                  type="password"
+                  className="form-input"
+                  value={newPassword}
+                  onChange={(e)=>setNewPassword(e.target.value)}
+                />
+              </div>
+
+              <button
+                className="btn btn-primary"
+                onClick={handlePasswordUpdate}
+              >
+                Update Password
+              </button>
+
             </div>
-
-            <div className="form-group">
-              <label>New Password</label>
-              <input type="password" className="form-input" />
-            </div>
-
-            <button className="btn btn-primary">
-              Update Password
-            </button>
-
-          </div>
+          )}
 
           {/* NOTIFICATIONS */}
 
-          <div className="settings-card">
+          {activeTab === "notifications" && (
 
-            <div className="card-title">Notifications</div>
+            <div className="settings-card">
 
-            <div className="settings-toggle">
+              <div className="card-title">Notifications</div>
 
-              <span>Email Notifications</span>
+              <div className="settings-toggle">
 
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={notifications}
-                  onChange={() => setNotifications(!notifications)}
-                />
-                <span className="slider"></span>
-              </label>
+                <span>Email Notifications</span>
+
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={notifications}
+                    onChange={()=>setNotifications(!notifications)}
+                  />
+                  <span className="slider"></span>
+                </label>
+
+              </div>
 
             </div>
-
-          </div>
+          )}
 
           {/* PREFERENCES */}
 
-          <div className="settings-card">
+          {activeTab === "preferences" && (
 
-            <div className="card-title">Preferences</div>
+            <div className="settings-card">
 
-            <div className="settings-toggle">
+              <div className="card-title">Preferences</div>
 
-              <span>Dark Mode</span>
+              <div className="settings-toggle">
 
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={darkMode}
-                  onChange={() => setDarkMode(!darkMode)}
-                />
-                <span className="slider"></span>
-              </label>
+                <span>Dark Mode</span>
+
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={darkMode}
+                    onChange={()=>setDarkMode(!darkMode)}
+                  />
+                  <span className="slider"></span>
+                </label>
+
+              </div>
 
             </div>
-
-          </div>
+          )}
 
         </div>
 
