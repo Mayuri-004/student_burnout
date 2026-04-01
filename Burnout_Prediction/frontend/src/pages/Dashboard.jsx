@@ -1,5 +1,5 @@
 import AppLayout from "../components/AppLayout";
-import ScoreRing from "../components/ScoreRing";
+import ScoreRing from "../components/ScoringRing";
 import TrendChart from "../components/TrendChart";
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
