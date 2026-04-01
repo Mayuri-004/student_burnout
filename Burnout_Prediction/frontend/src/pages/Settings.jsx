@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import AppLayout from "../components/AppLayout";
 
+
+
 const Settings = ({ onNav, onLogout }) => {
+
+  
 
   // ACTIVE SETTINGS TAB
   const [activeTab, setActiveTab] = useState("profile");
